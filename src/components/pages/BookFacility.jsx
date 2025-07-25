@@ -9,8 +9,9 @@ const BookFacility = () => {
           <h1 className="font-outfit font-bold text-3xl text-gray-900 mb-2">
             Book a Facility
           </h1>
-          <p className="text-gray-600">
-            Choose from our available facilities and book your preferred time slot.
+<p className="text-gray-600">
+            Choose from our available facilities and book your preferred time slot. 
+            Select a date up to 7 days in advance to view availability.
           </p>
         </div>
       </div>
