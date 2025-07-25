@@ -119,6 +119,138 @@ export const creditService = {
       newBalance: userCredits,
       transactionId: `TXN-${Date.now()}`
     };
+},
+
+  async getActivityStats() {
+    await delay(200);
+    const bookingEntries = usageHistory.filter(entry => entry.type === 'booking');
+    const purchaseEntries = usageHistory.filter(entry => entry.type === 'purchase');
+    
+    const totalSessions = bookingEntries.length;
+    const totalCreditsSpent = bookingEntries.reduce((sum, entry) => sum + Math.abs(entry.credits), 0);
+    const totalCreditsPurchased = purchaseEntries.reduce((sum, entry) => sum + entry.credits, 0);
+    
+    const now = new Date();
+    const membershipDays = Math.floor((now - new Date(membershipStatus.joinDate)) / (1000 * 60 * 60 * 1000));
+    
+    return {
+      totalSessions,
+      totalCreditsSpent,
+      totalCreditsPurchased,
+      membershipDays,
+      averageSessionsPerWeek: Math.round(totalSessions / Math.max(membershipDays / 7, 1)),
+      averageCreditsPerSession: totalSessions > 0 ? Math.round(totalCreditsSpent / totalSessions) : 0
+    };
+  },
+
+  async getMonthlyUsagePattern() {
+    await delay(150);
+    const monthlyData = {};
+    const now = new Date();
+    
+    // Get last 6 months of data
+    for (let i = 5; i >= 0; i--) {
+      const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = month.toISOString().slice(0, 7);
+      monthlyData[monthKey] = 0;
+    }
+    
+    usageHistory
+      .filter(entry => entry.type === 'booking')
+      .forEach(entry => {
+        const monthKey = entry.date.slice(0, 7);
+        if (monthlyData.hasOwnProperty(monthKey)) {
+          monthlyData[monthKey]++;
+        }
+      });
+    
+    return monthlyData;
+  },
+
+  async getPeakUsageTimes() {
+    await delay(100);
+    // Mock peak usage data based on common gym patterns
+    return [
+      { time: '07:00', sessions: 15, percentage: 25 },
+      { time: '18:00', sessions: 12, percentage: 20 },
+      { time: '19:00', sessions: 10, percentage: 17 }
+    ];
+  },
+
+  async getAchievements() {
+    await delay(100);
+    const stats = await this.getActivityStats();
+    const achievements = [];
+    
+    // Session-based achievements
+    if (stats.totalSessions >= 1) {
+      achievements.push({
+        id: 'first_session',
+        name: 'First Steps',
+        description: 'Completed your first session',
+        icon: 'Star',
+        unlocked: true,
+        unlockedDate: usageHistory.find(entry => entry.type === 'booking')?.date
+      });
+    }
+    
+    if (stats.totalSessions >= 10) {
+      achievements.push({
+        id: 'regular_member',
+        name: 'Regular Member',
+        description: 'Completed 10 sessions',
+        icon: 'Trophy',
+        unlocked: true
+      });
+    }
+    
+    if (stats.totalSessions >= 25) {
+      achievements.push({
+        id: 'fitness_enthusiast',
+        name: 'Fitness Enthusiast',
+        description: 'Reached 25 sessions',
+        icon: 'Award',
+        unlocked: true
+      });
+    }
+    
+    // Consistency achievements
+    if (stats.averageSessionsPerWeek >= 3) {
+      achievements.push({
+        id: 'consistency_pro',
+        name: 'Consistency Pro',
+        description: 'Average 3+ sessions per week',
+        icon: 'Target',
+        unlocked: true
+      });
+    }
+    
+    // Future goals
+    if (stats.totalSessions < 50) {
+      achievements.push({
+        id: 'half_century',
+        name: 'Half Century',
+        description: 'Complete 50 sessions',
+        icon: 'Medal',
+        unlocked: false,
+        progress: stats.totalSessions,
+        target: 50
+      });
+    }
+    
+    if (stats.totalSessions < 100) {
+      achievements.push({
+        id: 'century_club',
+        name: 'Century Club',
+        description: 'Join the 100 session club',
+        icon: 'Crown',
+        unlocked: false,
+        progress: stats.totalSessions,
+        target: 100
+      });
+    }
+    
+    return achievements;
   },
 
   async updateMembershipStatus(newStatus) {
