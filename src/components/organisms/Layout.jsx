@@ -5,7 +5,7 @@ import MobileNavigation from "@/components/organisms/MobileNavigation";
 
 const Layout = ({ children }) => {
 return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-20 lg:pb-0">
       <Header key={Math.random()} />
       <Navigation />
       
