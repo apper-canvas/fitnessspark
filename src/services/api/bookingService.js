@@ -49,6 +49,7 @@ export const bookingService = {
       const newBooking = {
         Id: maxId + 1,
         ...bookingData,
+        familyMemberId: bookingData.familyMemberId || 1, // Default to first family member
         isCheckedIn: false
       };
       bookings.push(newBooking);
@@ -130,6 +131,7 @@ export const bookingService = {
         date: nextWeekDateStr,
         startTime: originalBooking.startTime,
         endTime: originalBooking.endTime || targetTimeSlot.endTime,
+        familyMemberId: originalBooking.familyMemberId,
         status: 'confirmed'
       };
       
@@ -151,7 +153,7 @@ export const bookingService = {
     return { ...bookings[index] };
   },
 
-async delete(id) {
+  async delete(id) {
     await delay(250);
     const index = bookings.findIndex(b => b.Id === parseInt(id));
     if (index === -1) {
@@ -213,6 +215,49 @@ async delete(id) {
       return bookings[bookingIndex];
     } catch (error) {
       throw new Error(`Failed to check in: ${error.message}`);
+    }
+  },
+
+  async transferBooking(bookingId, newFamilyMemberId) {
+    await delay(300);
+    
+    try {
+      const bookingIndex = bookings.findIndex(b => b.Id === parseInt(bookingId));
+      if (bookingIndex === -1) {
+        throw new Error('Booking not found');
+      }
+
+      const booking = bookings[bookingIndex];
+      if (booking.status !== 'confirmed') {
+        throw new Error('Only confirmed bookings can be transferred');
+      }
+
+      if (booking.familyMemberId === parseInt(newFamilyMemberId)) {
+        throw new Error('Booking is already assigned to this family member');
+      }
+
+      // Update the booking with new family member
+      bookings[bookingIndex] = {
+        ...booking,
+        familyMemberId: parseInt(newFamilyMemberId)
+      };
+
+      // Import notification service dynamically
+      const { notificationService } = await import('@/services/api/notificationService');
+      
+      // Create transfer notification
+      await notificationService.create({
+        type: 'booking_transferred',
+        title: 'Booking Transferred',
+        message: `${booking.facilityName} booking on ${booking.date} has been transferred`,
+        actionUrl: '/my-bookings',
+        facilityId: booking.facilityId,
+        bookingId: booking.Id
+      });
+
+      return { ...bookings[bookingIndex] };
+    } catch (error) {
+      throw new Error(`Failed to transfer booking: ${error.message}`);
     }
   }
 };

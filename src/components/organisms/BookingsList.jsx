@@ -110,7 +110,8 @@ const handleCheckIn = async (bookingId) => {
       toast.error(error.message || 'Failed to check in');
     }
   };
-const handleRebook = async (booking) => {
+
+  const handleRebook = async (booking) => {
     setRebooking(true);
     try {
       await bookingService.rebook(booking.Id);
@@ -123,14 +124,24 @@ const handleRebook = async (booking) => {
     }
   };
 
+  const handleTransfer = async (bookingId, familyMember) => {
+    try {
+      await bookingService.transferBooking(bookingId, familyMember.Id);
+      toast.success(`Booking transferred to ${familyMember.name} successfully!`);
+      loadBookings(); // Refresh the list
+    } catch (error) {
+      toast.error(error.message || 'Failed to transfer booking');
+    }
+  };
+
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadBookings} />;
 const emptyMessage = showPast ? "No past bookings" : "No upcoming bookings";
   if (bookings.length === 0) return <Empty message={emptyMessage} />;
   
-  return (
+return (
     <>
-<div className="space-y-4">
+      <div className="space-y-4">
         {bookings.map((booking) => (
           <BookingCard
             key={booking.Id}
@@ -138,6 +149,7 @@ const emptyMessage = showPast ? "No past bookings" : "No upcoming bookings";
             onCancel={showPast ? undefined : handleCancelBooking}
             onCheckIn={showPast ? undefined : handleCheckIn}
             onRebook={showPast ? handleRebook : undefined}
+            onTransfer={showPast ? undefined : handleTransfer}
             showRebook={showPast}
           />
         ))}
