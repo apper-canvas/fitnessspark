@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ApperIcon from "@/components/ApperIcon";
+import NotificationsPanel from "@/components/organisms/NotificationsPanel";
+import { notificationService } from "@/services/api/notificationService";
 import { creditService } from "@/services/api/creditService";
 
 const Header = () => {
 const location = useLocation();
   const [credits, setCredits] = useState(10);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const loadCredits = async () => {
@@ -51,9 +55,26 @@ const location = useLocation();
             <ApperIcon name="Coins" size={16} className="text-amber-600" />
             <span className="text-sm font-semibold text-amber-700">{credits}</span>
           </div>
-          <div className="p-2 bg-surface rounded-lg">
-            <ApperIcon name="Bell" size={20} className="text-gray-600" />
+          
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-2 bg-surface rounded-lg hover:bg-gray-100 transition-colors relative"
+            >
+              <ApperIcon name="Bell" size={20} className="text-gray-600" />
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </div>
+              )}
+            </button>
+            
+            <NotificationsPanel 
+              isOpen={showNotifications}
+              onClose={() => setShowNotifications(false)}
+            />
           </div>
+          
           <div className="p-2 bg-gradient-to-br from-primary to-secondary rounded-lg">
             <ApperIcon name="User" size={20} className="text-white" />
           </div>

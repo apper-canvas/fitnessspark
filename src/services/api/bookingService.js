@@ -1,15 +1,13 @@
-import bookingsData from "@/services/mockData/bookings.json";
-import React from "react";
 import { creditService } from "@/services/api/creditService";
-import Error from "@/components/ui/Error";
+import bookingsData from "@/services/mockData/bookings.json";
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // CustomEvent polyfill for environments that don't support it
 const safeCustomEvent = (eventName, detail) => {
   if (typeof window !== 'undefined' && window.dispatchEvent) {
-    if (typeof CustomEvent === 'function') {
-      return new CustomEvent(eventName, detail);
+    if (typeof window.CustomEvent === 'function') {
+      return new window.CustomEvent(eventName, detail);
     } else {
       // Fallback for older browsers
       const event = document.createEvent('CustomEvent');
@@ -41,6 +39,9 @@ async create(bookingData) {
     await delay(400);
     
     try {
+      // Import notification service dynamically to avoid circular dependency
+      const { notificationService } = await import('@/services/api/notificationService');
+      
       // Deduct credit before creating booking
       await creditService.deductCredit(1);
       
@@ -51,6 +52,9 @@ const newBooking = {
         isCheckedIn: false
       };
       bookings.push(newBooking);
+      
+      // Create booking confirmation notification
+      await notificationService.createBookingConfirmation(newBooking);
       
       // Notify availability change
       const event = safeCustomEvent('facilityAvailabilityChanged', {
@@ -89,8 +93,14 @@ async delete(id) {
     const deleted = { ...bookings[index] };
     
     try {
+      // Import notification service dynamically to avoid circular dependency
+      const { notificationService } = await import('@/services/api/notificationService');
+      
       // Remove booking first, then refund credit
       bookings.splice(index, 1);
+      
+      // Create booking cancellation notification
+      await notificationService.createBookingCancellation(deleted);
       
       // Refund credit after successful deletion
       await creditService.addCredit(1);
