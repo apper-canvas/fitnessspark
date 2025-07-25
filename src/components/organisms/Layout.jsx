@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/organisms/Header";
 import Navigation from "@/components/organisms/Navigation";
 import MobileNavigation from "@/components/organisms/MobileNavigation";
 
 const Layout = ({ children }) => {
-  return (
+return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <Header key={Math.random()} />
       <Navigation />
       
       <main className="px-6 py-8 pb-20 lg:pb-8">

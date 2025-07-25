@@ -10,6 +10,7 @@ import ApperIcon from "@/components/ApperIcon";
 import { facilityService } from "@/services/api/facilityService";
 import { timeSlotService } from "@/services/api/timeSlotService";
 import { bookingService } from "@/services/api/bookingService";
+import { creditService } from "@/services/api/creditService";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 
@@ -20,7 +21,9 @@ const FacilityList = () => {
   const [error, setError] = useState(null);
   const [expandedFacility, setExpandedFacility] = useState(null);
   const [bookingSlot, setBookingSlot] = useState(null);
-
+const [credits, setCredits] = useState(10);
+  const [showCreditConfirm, setShowCreditConfirm] = useState(false);
+  const [pendingSlot, setPendingSlot] = useState(null);
   useEffect(() => {
     loadData();
   }, []);
@@ -42,34 +45,67 @@ const FacilityList = () => {
     }
   };
 
-  const handleBookSlot = async (timeSlot) => {
+const handleBookSlot = async (timeSlot) => {
     try {
-      setBookingSlot(timeSlot.Id);
-      const facility = facilities.find(f => f.Id === timeSlot.facilityId);
+      // Check credits first
+      const currentCredits = await creditService.getCredits();
+      setCredits(currentCredits);
+      
+      if (currentCredits < 1) {
+        toast.error("Insufficient credits to make a booking!");
+        return;
+      }
+
+      // Show confirmation dialog
+      setPendingSlot(timeSlot);
+      setShowCreditConfirm(true);
+    } catch (err) {
+      toast.error(err.message || "Failed to check credits");
+    }
+  };
+
+  const confirmBooking = async () => {
+    if (!pendingSlot) return;
+    
+    try {
+      setBookingSlot(pendingSlot.Id);
+      setShowCreditConfirm(false);
+      
+      const facility = facilities.find(f => f.Id === pendingSlot.facilityId);
       
       const booking = {
-        facilityId: timeSlot.facilityId,
+        facilityId: pendingSlot.facilityId,
         facilityName: facility.name,
-        date: timeSlot.date,
-        startTime: timeSlot.startTime,
-        endTime: timeSlot.endTime,
+        date: pendingSlot.date,
+        startTime: pendingSlot.startTime,
+        endTime: pendingSlot.endTime,
         status: "confirmed"
       };
 
       await bookingService.create(booking);
       
       // Update time slot availability
-      await timeSlotService.update(timeSlot.Id, { isAvailable: false });
+      await timeSlotService.update(pendingSlot.Id, { isAvailable: false });
+      
+      // Update credits display
+      const newCredits = await creditService.getCredits();
+      setCredits(newCredits);
       
       // Refresh data
       await loadData();
       
-      toast.success(`Successfully booked ${facility.name} for ${timeSlot.startTime}!`);
+      toast.success(`Successfully booked ${facility.name} for ${pendingSlot.startTime}! 1 credit deducted.`);
     } catch (err) {
       toast.error(err.message || "Failed to book facility");
     } finally {
       setBookingSlot(null);
+      setPendingSlot(null);
     }
+  };
+
+  const cancelBooking = () => {
+    setShowCreditConfirm(false);
+    setPendingSlot(null);
   };
 
   const getFacilityTimeSlots = (facilityId) => {

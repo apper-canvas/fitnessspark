@@ -1,4 +1,5 @@
 import bookingsData from "@/services/mockData/bookings.json";
+import { creditService } from "@/services/api/creditService";
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -19,8 +20,12 @@ export const bookingService = {
     return { ...booking };
   },
 
-  async create(bookingData) {
+async create(bookingData) {
     await delay(400);
+    
+    // Deduct credit before creating booking
+    await creditService.deductCredit(1);
+    
     const maxId = bookings.length > 0 ? Math.max(...bookings.map(b => b.Id)) : 0;
     const newBooking = {
       Id: maxId + 1,
