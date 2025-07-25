@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { bookingService } from "@/services/api/bookingService";
 import { timeSlotService } from "@/services/api/timeSlotService";
-import Button from "@/components/atoms/Button";
+import { bookingService } from "@/services/api/bookingService";
 import BookingCard from "@/components/molecules/BookingCard";
+import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
 const BookingsList = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,9 +29,9 @@ const loadBookings = async () => {
       const upcomingBookings = data.filter(booking => booking.date >= today);
       setBookings(upcomingBookings);
       
-// Trigger facility availability refresh
-      if (typeof window !== 'undefined' && window.dispatchEvent && typeof CustomEvent !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('refreshFacilityAvailability'));
+      // Trigger facility availability refresh
+      if (typeof window !== 'undefined' && window.dispatchEvent && window.CustomEvent) {
+        window.dispatchEvent(new window.CustomEvent('refreshFacilityAvailability'));
       }
     } catch (err) {
       setError(err.message || "Failed to load bookings");
@@ -72,9 +72,9 @@ const confirmCancelBooking = async () => {
       // Refresh bookings and trigger facility availability update
       await loadBookings();
       
-// Additional immediate refresh trigger for facility list
-      if (typeof window !== 'undefined' && window.dispatchEvent && typeof CustomEvent !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('facilityAvailabilityChanged', {
+      // Additional immediate refresh trigger for facility list
+      if (typeof window !== 'undefined' && window.dispatchEvent && window.CustomEvent) {
+        window.dispatchEvent(new window.CustomEvent('facilityAvailabilityChanged', {
           detail: { 
             facilityId: bookingToCancel.facilityId, 
             change: 1,
@@ -98,19 +98,28 @@ const confirmCancelBooking = async () => {
       setBookingToCancel(null);
     }
   };
+const handleCheckIn = async (bookingId) => {
+    try {
+      await bookingService.checkIn(bookingId);
+      toast.success('Successfully checked in!');
+      loadBookings();
+    } catch (error) {
+      toast.error(error.message || 'Failed to check in');
+    }
+  };
 
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadBookings} />;
   if (bookings.length === 0) return <Empty message="No upcoming bookings" />;
-
   return (
     <>
       <div className="space-y-4">
-        {bookings.map((booking) => (
+{bookings.map((booking) => (
           <BookingCard
             key={booking.Id}
             booking={booking}
             onCancel={handleCancelBooking}
+            onCheckIn={handleCheckIn}
           />
         ))}
       </div>

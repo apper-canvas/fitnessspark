@@ -11,9 +11,10 @@ const Badge = forwardRef(({
     default: "bg-gray-100 text-gray-800",
     success: "bg-accent/10 text-accent",
     warning: "bg-warning/10 text-warning",
-    error: "bg-error/10 text-error",
+error: "bg-error/10 text-error",
     primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary/10 text-secondary"
+    secondary: "bg-secondary/10 text-secondary",
+    info: "bg-info/10 text-info"
   };
 
   return (

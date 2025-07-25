@@ -1,5 +1,7 @@
-import { creditService } from "@/services/api/creditService";
 import bookingsData from "@/services/mockData/bookings.json";
+import React from "react";
+import { creditService } from "@/services/api/creditService";
+import Error from "@/components/ui/Error";
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -43,9 +45,10 @@ async create(bookingData) {
       await creditService.deductCredit(1);
       
       const maxId = bookings.length > 0 ? Math.max(...bookings.map(b => b.Id)) : 0;
-      const newBooking = {
+const newBooking = {
         Id: maxId + 1,
-        ...bookingData
+        ...bookingData,
+        isCheckedIn: false
       };
       bookings.push(newBooking);
       
@@ -105,6 +108,31 @@ async delete(id) {
       // If credit refund fails, restore the booking
       bookings.splice(index, 0, deleted);
       throw new Error(`Failed to delete booking: ${error.message}`);
+    }
+  },
+
+  async checkIn(id) {
+    await delay(500);
+    try {
+      const bookingIndex = bookings.findIndex(b => b.Id === parseInt(id));
+      if (bookingIndex === -1) {
+        throw new Error('Booking not found');
+      }
+
+      const booking = bookings[bookingIndex];
+      if (booking.isCheckedIn) {
+        throw new Error('Already checked in');
+      }
+
+      bookings[bookingIndex] = {
+        ...booking,
+        isCheckedIn: true
+      };
+
+      safeCustomEvent('bookingUpdated', { booking: bookings[bookingIndex] });
+      return bookings[bookingIndex];
+    } catch (error) {
+      throw new Error(`Failed to check in: ${error.message}`);
     }
   }
 };
