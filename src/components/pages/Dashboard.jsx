@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [weeklyChartData, setWeeklyChartData] = useState({ options: {}, series: [] });
 const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [favoriteTimes, setFavoriteTimes] = useState([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -38,11 +39,33 @@ const [loading, setLoading] = useState(true);
 
       const now = new Date();
       const today = format(now, "yyyy-MM-dd");
-      
-      // Today's bookings
+// Today's bookings
       const todayBookings = bookings.filter(booking => booking.date === today);
       setTodayBookings(todayBookings);
       
+      // Calculate favorite times (most frequently booked facility-time combinations)
+      const timeSlotCounts = {};
+      bookings.forEach(booking => {
+        const key = `${booking.facilityName}-${booking.startTime}`;
+        timeSlotCounts[key] = (timeSlotCounts[key] || 0) + 1;
+      });
+      
+      const favoriteSlots = Object.entries(timeSlotCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 4)
+        .map(([key, count]) => {
+          const [facilityName, startTime] = key.split('-');
+          const facility = facilities.find(f => f.name === facilityName);
+          return {
+            facilityName,
+            facilityId: facility?.Id,
+            startTime,
+            count
+          };
+        })
+        .filter(slot => slot.facilityId);
+      
+      setFavoriteTimes(favoriteSlots);
       // Upcoming bookings (next 3 days)
       const next3Days = Array.from({ length: 3 }, (_, i) => format(addDays(now, i + 1), "yyyy-MM-dd"));
       const upcomingBookings = bookings.filter(booking => next3Days.includes(booking.date));
@@ -158,7 +181,23 @@ const [loading, setLoading] = useState(true);
   };
 
   const handleQuickBook = (facilityId) => {
-    navigate(`/book-facility?facility=${facilityId}`);
+navigate(`/book-facility?facility=${facilityId}`);
+  };
+
+  const handleQuickRebook = async (favoriteTime) => {
+    try {
+      // Create a mock booking object for rebooking
+      const mockBooking = {
+        facilityId: favoriteTime.facilityId,
+        facilityName: favoriteTime.facilityName,
+        startTime: favoriteTime.startTime
+      };
+      
+      await bookingService.rebook(null, mockBooking);
+      toast.success(`Successfully booked ${favoriteTime.facilityName} at ${favoriteTime.startTime}!`);
+    } catch (error) {
+      toast.error(error.message || 'Failed to book favorite time slot');
+    }
   };
 
   if (loading) return <Loading />;
@@ -304,6 +343,53 @@ return (
                   </div>
                 </Button>
               ))
+            )}
+{/* Favorite Times Section */}
+            {favoriteTimes.length > 0 && (
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <ApperIcon name="Heart" size={20} className="text-red-500" />
+                    <h2 className="font-outfit font-semibold text-xl text-gray-900">
+                      Favorite Times
+                    </h2>
+                  </div>
+                  <span className="text-sm text-gray-500">Quick rebook your favorites</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {favoriteTimes.map((favoriteTime, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg border border-gray-200">
+                          <ApperIcon 
+                            name={favoriteTime.facilityName === 'Pool' ? 'Waves' : 
+                                  favoriteTime.facilityName === 'Gym' ? 'Dumbbell' :
+                                  favoriteTime.facilityName === 'Tennis Court' ? 'Trophy' : 'Activity'} 
+                            size={16} 
+                            className="text-primary" 
+                          />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{favoriteTime.facilityName}</p>
+                          <p className="text-sm text-gray-600">{favoriteTime.startTime} • Booked {favoriteTime.count} times</p>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleQuickRebook(favoriteTime)}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                      >
+                        <ApperIcon name="RotateCcw" size={14} />
+                        Rebook
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </Card>
             )}
             
             <Button

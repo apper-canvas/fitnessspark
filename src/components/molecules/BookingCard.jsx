@@ -4,14 +4,19 @@ import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
 import QRCode from "qrcode";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, addDays } from "date-fns";
 
-const BookingCard = ({ booking, onCancel, onCheckIn, className }) => {
+const BookingCard = ({ booking, onCancel, onCheckIn, onRebook, className, showRebook = false }) => {
   const [showQRModal, setShowQRModal] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const bookingDate = parseISO(booking.date);
 const isToday = format(new Date(), "yyyy-MM-dd") === booking.date;
-  
+const handleRebook = async () => {
+    if (onRebook) {
+      await onRebook(booking);
+    }
+  };
+
   const generateQRCode = async () => {
     try {
       const qrData = JSON.stringify({
@@ -96,6 +101,17 @@ const isToday = format(new Date(), "yyyy-MM-dd") === booking.date;
                 className="text-error hover:bg-error/10"
               >
                 <ApperIcon name="X" size={16} />
+              </Button>
+)}
+            {showRebook && (
+              <Button
+                onClick={handleRebook}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <ApperIcon name="RotateCcw" size={16} />
+                Rebook
               </Button>
             )}
           </div>

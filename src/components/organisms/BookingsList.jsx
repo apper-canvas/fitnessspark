@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { timeSlotService } from "@/services/api/timeSlotService";
 import { bookingService } from "@/services/api/bookingService";
+import { timeSlotService } from "@/services/api/timeSlotService";
+import Button from "@/components/atoms/Button";
 import BookingCard from "@/components/molecules/BookingCard";
-import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import Button from "@/components/atoms/Button";
-const BookingsList = () => {
+import Loading from "@/components/ui/Loading";
+const BookingsList = ({ showPast = false }) => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState(null);
   const [cancelling, setCancelling] = useState(false);
+  const [rebooking, setRebooking] = useState(false);
 
   useEffect(() => {
     loadBookings();
@@ -24,10 +25,12 @@ const loadBookings = async () => {
       setError(null);
       setLoading(true);
       const data = await bookingService.getAll();
-      // Filter for upcoming bookings only
+// Filter bookings based on showPast prop
       const today = new Date().toISOString().split("T")[0];
-      const upcomingBookings = data.filter(booking => booking.date >= today);
-      setBookings(upcomingBookings);
+      const filteredBookings = showPast 
+        ? data.filter(booking => booking.date < today)
+        : data.filter(booking => booking.date >= today);
+      setBookings(filteredBookings);
       
       // Trigger facility availability refresh
       if (typeof window !== 'undefined' && window.dispatchEvent && window.CustomEvent) {
@@ -107,19 +110,35 @@ const handleCheckIn = async (bookingId) => {
       toast.error(error.message || 'Failed to check in');
     }
   };
+const handleRebook = async (booking) => {
+    setRebooking(true);
+    try {
+      await bookingService.rebook(booking.Id);
+      toast.success(`Successfully rebooked ${booking.facilityName} for next week!`);
+      loadBookings(); // Refresh the list
+    } catch (error) {
+      toast.error(error.message || 'Failed to rebook facility');
+    } finally {
+      setRebooking(false);
+    }
+  };
 
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadBookings} />;
-  if (bookings.length === 0) return <Empty message="No upcoming bookings" />;
+const emptyMessage = showPast ? "No past bookings" : "No upcoming bookings";
+  if (bookings.length === 0) return <Empty message={emptyMessage} />;
+  
   return (
     <>
-      <div className="space-y-4">
-{bookings.map((booking) => (
+<div className="space-y-4">
+        {bookings.map((booking) => (
           <BookingCard
             key={booking.Id}
             booking={booking}
-            onCancel={handleCancelBooking}
-            onCheckIn={handleCheckIn}
+            onCancel={showPast ? undefined : handleCancelBooking}
+            onCheckIn={showPast ? undefined : handleCheckIn}
+            onRebook={showPast ? handleRebook : undefined}
+            showRebook={showPast}
           />
         ))}
       </div>

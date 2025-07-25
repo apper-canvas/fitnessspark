@@ -35,7 +35,7 @@ export const bookingService = {
     return { ...booking };
   },
 
-async create(bookingData) {
+  async create(bookingData) {
     await delay(400);
     
     try {
@@ -46,7 +46,7 @@ async create(bookingData) {
       await creditService.deductCredit(1);
       
       const maxId = bookings.length > 0 ? Math.max(...bookings.map(b => b.Id)) : 0;
-const newBooking = {
+      const newBooking = {
         Id: maxId + 1,
         ...bookingData,
         isCheckedIn: false
@@ -68,6 +68,76 @@ const newBooking = {
     } catch (error) {
       // If credit deduction fails, don't create the booking
       throw new Error(`Failed to create booking: ${error.message}`);
+    }
+  },
+
+  async rebook(bookingId, bookingData = null) {
+    await delay(400);
+    
+    try {
+      let originalBooking;
+      
+      if (bookingId) {
+        // Rebooking from existing booking
+        originalBooking = bookings.find(b => b.Id === parseInt(bookingId));
+        if (!originalBooking) {
+          throw new Error("Original booking not found");
+        }
+      } else if (bookingData) {
+        // Quick rebook from favorite times
+        originalBooking = bookingData;
+      } else {
+        throw new Error("No booking information provided");
+      }
+
+      // Import services dynamically
+      const { timeSlotService } = await import('@/services/api/timeSlotService');
+      const { notificationService } = await import('@/services/api/notificationService');
+      
+      // Calculate next week's date
+      const originalDate = new Date(originalBooking.date || new Date());
+      const nextWeekDate = new Date(originalDate);
+      nextWeekDate.setDate(nextWeekDate.getDate() + 7);
+      const nextWeekDateStr = nextWeekDate.toISOString().split('T')[0];
+      
+      // Check if the time slot is available next week
+      const timeSlots = await timeSlotService.getAll();
+      const targetTimeSlot = timeSlots.find(slot => 
+        slot.facilityId === originalBooking.facilityId &&
+        slot.startTime === originalBooking.startTime
+      );
+      
+      if (!targetTimeSlot) {
+        throw new Error("Time slot not found");
+      }
+      
+      // Check if slot is available on the target date
+      const existingBooking = bookings.find(booking => 
+        booking.facilityId === originalBooking.facilityId &&
+        booking.date === nextWeekDateStr &&
+        booking.startTime === originalBooking.startTime &&
+        booking.status === 'confirmed'
+      );
+      
+      if (existingBooking) {
+        throw new Error("Time slot is already booked for next week");
+      }
+      
+      // Create the new booking
+      const newBookingData = {
+        facilityId: originalBooking.facilityId,
+        facilityName: originalBooking.facilityName,
+        date: nextWeekDateStr,
+        startTime: originalBooking.startTime,
+        endTime: originalBooking.endTime || targetTimeSlot.endTime,
+        status: 'confirmed'
+      };
+      
+      const newBooking = await this.create(newBookingData);
+      return newBooking;
+      
+    } catch (error) {
+      throw new Error(`Failed to rebook: ${error.message}`);
     }
   },
 
