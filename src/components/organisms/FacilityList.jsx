@@ -191,11 +191,9 @@ const getFacilityTimeSlots = (facilityId) => {
       slot.facilityId === facilityId && slot.date === selectedDateStr
     );
   };
-
-  const getAvailableSlots = (facilityId) => {
+const getDisplayAvailableSlots = (facilityId) => {
     return getFacilityTimeSlots(facilityId).filter(slot => slot.isAvailable).length;
   };
-
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadData} />;
   if (facilities.length === 0) return <Empty message="No facilities available" />;
@@ -297,8 +295,8 @@ const formatDateDisplay = (date) => {
 {facilities.map((facility) => (
           <FacilityCard
             key={facility.Id}
-            facility={facility}
-            availableSlots={getAvailableSlots(facility.Id)}
+facility={facility}
+            availableSlots={getDisplayAvailableSlots(facility.Id)}
             totalSlots={getFacilityTimeSlots(facility.Id).length}
             realTimeCapacity={true}
             onClick={() => setExpandedFacility(
