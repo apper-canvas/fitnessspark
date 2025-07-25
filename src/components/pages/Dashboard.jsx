@@ -1,37 +1,127 @@
-import React, { useState, useEffect } from "react";
-import DashboardStats from "@/components/organisms/DashboardStats";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { addDays, endOfWeek, format, isWithinInterval, startOfWeek } from "date-fns";
+import Chart from "react-apexcharts";
+import { timeSlotService } from "@/services/api/timeSlotService";
+import { bookingService } from "@/services/api/bookingService";
+import { facilityService } from "@/services/api/facilityService";
+import ApperIcon from "@/components/ApperIcon";
 import BookingCard from "@/components/molecules/BookingCard";
-import Button from "@/components/atoms/Button";
-import Card from "@/components/atoms/Card";
+import DashboardStats from "@/components/organisms/DashboardStats";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
-import ApperIcon from "@/components/ApperIcon";
-import { useNavigate } from "react-router-dom";
-import { bookingService } from "@/services/api/bookingService";
-import { timeSlotService } from "@/services/api/timeSlotService";
-import { toast } from "react-toastify";
-import { format } from "date-fns";
-
+import Button from "@/components/atoms/Button";
+import Card from "@/components/atoms/Card";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [todayBookings, setTodayBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [upcomingBookings, setUpcomingBookings] = useState([]);
+  const [favoriteFacilities, setFavoriteFacilities] = useState([]);
+  const [weeklyChartData, setWeeklyChartData] = useState({ options: {}, series: [] });
+const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadTodayBookings();
+    loadDashboardData();
   }, []);
 
-  const loadTodayBookings = async () => {
+  const loadDashboardData = async () => {
     try {
       setError(null);
       setLoading(true);
-      const bookings = await bookingService.getAll();
-      const today = format(new Date(), "yyyy-MM-dd");
+      
+      const [bookings, facilities] = await Promise.all([
+        bookingService.getAll(),
+        facilityService.getAll()
+      ]);
+
+      const now = new Date();
+      const today = format(now, "yyyy-MM-dd");
+      
+      // Today's bookings
       const todayBookings = bookings.filter(booking => booking.date === today);
       setTodayBookings(todayBookings);
+      
+      // Upcoming bookings (next 3 days)
+      const next3Days = Array.from({ length: 3 }, (_, i) => format(addDays(now, i + 1), "yyyy-MM-dd"));
+      const upcomingBookings = bookings.filter(booking => next3Days.includes(booking.date));
+      setUpcomingBookings(upcomingBookings);
+      
+      // Calculate favorite facilities (most booked)
+      const facilityBookings = {};
+      bookings.forEach(booking => {
+        facilityBookings[booking.facilityId] = (facilityBookings[booking.facilityId] || 0) + 1;
+      });
+      
+      const sortedFacilities = facilities
+        .map(facility => ({
+          ...facility,
+          bookingCount: facilityBookings[facility.Id] || 0
+        }))
+        .sort((a, b) => b.bookingCount - a.bookingCount)
+        .slice(0, 3);
+      
+      setFavoriteFacilities(sortedFacilities);
+      
+      // Weekly chart data
+      const weekStart = startOfWeek(now);
+      const weekEnd = endOfWeek(now);
+      const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+      
+      const dailyBookings = weekDays.map(day => {
+        const dayStr = format(day, "yyyy-MM-dd");
+        return bookings.filter(booking => booking.date === dayStr).length;
+      });
+      
+      setWeeklyChartData({
+        options: {
+          chart: {
+            type: 'area',
+            height: 300,
+            toolbar: { show: false },
+            foreColor: '#6B7280'
+          },
+          dataLabels: { enabled: false },
+          stroke: {
+            curve: 'smooth',
+            width: 3,
+            colors: ['#2563EB']
+          },
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.4,
+              opacityTo: 0.1,
+              stops: [0, 100]
+            },
+            colors: ['#2563EB']
+          },
+          grid: {
+            borderColor: '#E5E7EB',
+            strokeDashArray: 3
+          },
+          xaxis: {
+            categories: weekDays.map(day => format(day, 'EEE')),
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+          },
+          yaxis: {
+            title: { text: 'Bookings' }
+          },
+          tooltip: {
+            theme: 'light'
+          }
+        },
+        series: [{
+          name: 'Bookings',
+          data: dailyBookings
+        }]
+      });
+      
     } catch (err) {
-      setError(err.message || "Failed to load today's bookings");
+      setError(err.message || "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -39,7 +129,8 @@ const Dashboard = () => {
 
   const handleCancelBooking = async (bookingId) => {
     try {
-      const booking = todayBookings.find(b => b.Id === bookingId);
+      const allBookings = [...todayBookings, ...upcomingBookings];
+      const booking = allBookings.find(b => b.Id === bookingId);
       if (!booking) return;
 
       // Find and update the corresponding time slot
@@ -57,8 +148,8 @@ const Dashboard = () => {
       // Delete the booking
       await bookingService.delete(bookingId);
       
-      // Refresh bookings
-      await loadTodayBookings();
+      // Refresh dashboard
+      await loadDashboardData();
       
       toast.success("Booking cancelled successfully!");
     } catch (err) {
@@ -66,7 +157,13 @@ const Dashboard = () => {
     }
   };
 
-  return (
+  const handleQuickBook = (facilityId) => {
+    navigate(`/book-facility?facility=${facilityId}`);
+  };
+
+  if (loading) return <Loading />;
+  if (error) return <Error message={error} onRetry={loadDashboardData} />;
+return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
@@ -74,7 +171,7 @@ const Dashboard = () => {
             Welcome back!
           </h1>
           <p className="text-gray-600">
-            Ready for your workout? Check your bookings and reserve facilities.
+            Ready for your workout? Check your activity and book your favorite facilities.
           </p>
         </div>
         <Button 
@@ -88,7 +185,21 @@ const Dashboard = () => {
 
       <DashboardStats />
 
-      <div className="grid lg:grid-cols-2 gap-8">
+      {/* Weekly Usage Chart */}
+      <Card className="p-6">
+        <h2 className="font-outfit font-bold text-xl text-gray-900 mb-6">
+          Weekly Activity
+        </h2>
+        <Chart 
+          options={weeklyChartData.options}
+          series={weeklyChartData.series}
+          type="area"
+          height={300}
+        />
+      </Card>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Today's Bookings */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="font-outfit font-bold text-xl text-gray-900">
@@ -104,11 +215,7 @@ const Dashboard = () => {
             </Button>
           </div>
 
-          {loading ? (
-            <Loading />
-          ) : error ? (
-            <Error message={error} onRetry={loadTodayBookings} />
-          ) : todayBookings.length === 0 ? (
+          {todayBookings.length === 0 ? (
             <div className="text-center py-8">
               <ApperIcon name="Calendar" size={48} className="mx-auto mb-4 text-gray-300" />
               <p className="text-gray-500 mb-4">No bookings for today</p>
@@ -129,32 +236,85 @@ const Dashboard = () => {
           )}
         </Card>
 
+        {/* Upcoming Bookings */}
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-outfit font-bold text-xl text-gray-900">
+              Next 3 Days
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/my-bookings")}
+              className="text-primary hover:bg-primary/10"
+            >
+              View All
+            </Button>
+          </div>
+
+          {upcomingBookings.length === 0 ? (
+            <div className="text-center py-8">
+              <ApperIcon name="CalendarDays" size={48} className="mx-auto mb-4 text-gray-300" />
+              <p className="text-gray-500 mb-4">No upcoming bookings</p>
+              <Button onClick={() => navigate("/book-facility")}>
+                Schedule Workout
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {upcomingBookings.slice(0, 3).map((booking) => (
+                <BookingCard
+                  key={booking.Id}
+                  booking={booking}
+                  onCancel={handleCancelBooking}
+                />
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* Favorite Facilities Quick Book */}
         <Card className="p-6">
           <h2 className="font-outfit font-bold text-xl text-gray-900 mb-6">
-            Quick Actions
+            Quick Book Favorites
           </h2>
           <div className="space-y-4">
+            {favoriteFacilities.length === 0 ? (
+              <div className="text-center py-8">
+                <ApperIcon name="Heart" size={48} className="mx-auto mb-4 text-gray-300" />
+                <p className="text-gray-500 mb-4">No favorite facilities yet</p>
+                <Button onClick={() => navigate("/book-facility")}>
+                  Explore Facilities
+                </Button>
+              </div>
+            ) : (
+              favoriteFacilities.map((facility) => (
+                <Button
+                  key={facility.Id}
+                  variant="secondary"
+                  className="w-full justify-start gap-3 p-4"
+                  onClick={() => handleQuickBook(facility.Id)}
+                >
+                  <ApperIcon name={facility.icon} size={20} />
+                  <div className="text-left">
+                    <div className="font-medium">{facility.name}</div>
+                    <div className="text-sm text-gray-500">
+                      {facility.bookingCount} sessions
+                    </div>
+                  </div>
+                </Button>
+              ))
+            )}
+            
             <Button
               variant="primary"
               className="w-full justify-start gap-3 p-4"
               onClick={() => navigate("/book-facility")}
             >
-              <ApperIcon name="Calendar" size={20} />
+              <ApperIcon name="Plus" size={20} />
               <div className="text-left">
-                <div className="font-medium">Book a Facility</div>
-                <div className="text-sm opacity-90">Reserve your workout space</div>
-              </div>
-            </Button>
-            
-            <Button
-              variant="secondary"
-              className="w-full justify-start gap-3 p-4"
-              onClick={() => navigate("/my-bookings")}
-            >
-              <ApperIcon name="BookOpen" size={20} />
-              <div className="text-left">
-                <div className="font-medium">My Bookings</div>
-                <div className="text-sm text-gray-500">View and manage reservations</div>
+                <div className="font-medium">Book Any Facility</div>
+                <div className="text-sm opacity-90">Browse all options</div>
               </div>
             </Button>
           </div>
