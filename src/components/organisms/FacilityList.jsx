@@ -295,13 +295,17 @@ const formatDateDisplay = (date) => {
 {facilities.map((facility) => (
           <FacilityCard
             key={facility.Id}
-facility={facility}
+            facility={facility}
             availableSlots={getDisplayAvailableSlots(facility.Id)}
             totalSlots={getFacilityTimeSlots(facility.Id).length}
             realTimeCapacity={true}
-            onClick={() => setExpandedFacility(
-              expandedFacility === facility.Id ? null : facility.Id
-            )}
+            onClick={(e) => {
+              if (!e.defaultPrevented) {
+                setExpandedFacility(
+                  expandedFacility === facility.Id ? null : facility.Id
+                );
+              }
+            }}
           />
         ))}
       </div>

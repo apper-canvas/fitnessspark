@@ -4,34 +4,168 @@
     "name": "Pool",
     "type": "Swimming Pool",
     "icon": "Waves",
-    "capacity": 20
+    "capacity": 20,
+    "description": "Olympic-sized swimming pool with crystal clear water, perfect for laps, water aerobics, and recreational swimming. Features temperature-controlled environment and modern filtration system.",
+    "operatingHours": {
+      "open": "06:00",
+      "close": "22:00"
+    },
+    "status": "open",
+    "images": [
+      "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&h=400&fit=crop"
+    ],
+    "equipment": [
+      "Olympic-size swimming pool",
+      "Pool lanes with lane ropes",
+      "Diving boards",
+      "Pool noodles and kickboards",
+      "Life jackets available",
+      "Pool thermometer"
+    ],
+    "amenities": [
+      "Heated changing rooms",
+      "Individual lockers",
+      "Hair dryers",
+      "Pool-side seating",
+      "Water fountain",
+      "First aid station"
+    ]
   },
   {
     "Id": 2,
     "name": "Tennis Court",
     "type": "Tennis Court",
     "icon": "Trophy",
-    "capacity": 4
+    "capacity": 4,
+    "description": "Professional-grade tennis court with premium synthetic surface. Ideal for singles and doubles matches, tennis lessons, and practice sessions. Features regulation-size court with proper lighting.",
+    "operatingHours": {
+      "open": "07:00",
+      "close": "21:00"
+    },
+    "status": "open",
+    "images": [
+      "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&h=400&fit=crop"
+    ],
+    "equipment": [
+      "Professional tennis court surface",
+      "Tennis nets (regulation height)",
+      "Court lines and markings",
+      "Ball hoppers",
+      "Score boards",
+      "Court maintenance tools"
+    ],
+    "amenities": [
+      "LED court lighting",
+      "Player benches",
+      "Water station",
+      "Equipment storage",
+      "Spectator seating",
+      "Windscreen barriers"
+    ]
   },
   {
     "Id": 3,
     "name": "Gym",
     "type": "Fitness Center",
     "icon": "Dumbbell",
-    "capacity": 30
+    "capacity": 30,
+    "description": "State-of-the-art fitness center equipped with modern cardio machines, strength training equipment, and free weights. Perfect for all fitness levels with climate-controlled environment.",
+    "operatingHours": {
+      "open": "05:00",
+      "close": "23:00"
+    },
+    "status": "open",
+    "images": [
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=800&h=400&fit=crop"
+    ],
+    "equipment": [
+      "Treadmills and ellipticals",
+      "Weight machines",
+      "Free weights and dumbbells",
+      "Resistance bands",
+      "Exercise mats",
+      "Cable machines"
+    ],
+    "amenities": [
+      "Air conditioning",
+      "Sound system",
+      "Water dispensers",
+      "Towel service",
+      "Personal lockers",
+      "Equipment sanitization stations"
+    ]
   },
   {
     "Id": 4,
     "name": "Yoga Studio",
     "type": "Yoga & Meditation",
     "icon": "Heart",
-    "capacity": 15
+    "capacity": 15,
+    "description": "Peaceful and serene yoga studio with natural lighting and calming atmosphere. Perfect for yoga classes, meditation sessions, and mindfulness practices. Features bamboo flooring and mirrors.",
+    "operatingHours": {
+      "open": "06:00",
+      "close": "20:00"
+    },
+    "status": "open",
+    "images": [
+      "https://images.unsplash.com/photo-1588286840104-8957b019727f?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1506629905607-b5f9ef5cb0be?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800&h=400&fit=crop"
+    ],
+    "equipment": [
+      "Yoga mats",
+      "Yoga blocks and straps",
+      "Meditation cushions",
+      "Bolsters and blankets",
+      "Balance balls",
+      "Sound system for ambient music"
+    ],
+    "amenities": [
+      "Natural lighting",
+      "Wall mirrors",
+      "Bamboo flooring",
+      "Essential oil diffusers",
+      "Temperature control",
+      "Quiet atmosphere"
+    ]
   },
   {
     "Id": 5,
     "name": "Squash Court",
     "type": "Squash Court",
     "icon": "Target",
-    "capacity": 2
+    "capacity": 2,
+    "description": "Professional squash court with regulation dimensions and high-quality playing surface. Features proper ventilation and lighting for optimal playing conditions. Suitable for all skill levels.",
+    "operatingHours": {
+      "open": "07:00",
+      "close": "22:00"
+    },
+    "status": "maintenance",
+    "images": [
+      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=400&fit=crop"
+    ],
+    "equipment": [
+      "Regulation squash court",
+      "Court walls and glass back",
+      "Squash rackets available",
+      "Practice balls",
+      "Score markers",
+      "Safety glasses"
+    ],
+    "amenities": [
+      "LED lighting system",
+      "Ventilation system",
+      "Player seating",
+      "Equipment storage",
+      "Court booking system",
+      "Emergency call button"
+    ]
   }
 ]

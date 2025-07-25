@@ -10,8 +10,17 @@ export const facilityService = {
     return [...facilities];
   },
 
-  async getById(id) {
+async getById(id) {
     await delay(200);
+    const facility = facilities.find(f => f.Id === parseInt(id));
+    if (!facility) {
+      throw new Error("Facility not found");
+    }
+    return { ...facility };
+  },
+
+  async getDetailedById(id) {
+    await delay(300);
     const facility = facilities.find(f => f.Id === parseInt(id));
     if (!facility) {
       throw new Error("Facility not found");

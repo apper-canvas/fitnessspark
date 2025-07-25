@@ -1,9 +1,10 @@
-import React from "react";
-import Card from "@/components/atoms/Card";
-import Badge from "@/components/atoms/Badge";
-import ApperIcon from "@/components/ApperIcon";
-
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import Card from '@/components/atoms/Card';
+import Badge from '@/components/atoms/Badge';
+import ApperIcon from '@/components/ApperIcon';
 const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className, realTimeCapacity = false }) => {
+  const navigate = useNavigate();
   const availabilityPercentage = totalSlots > 0 ? (availableSlots / totalSlots) * 100 : 0;
   
   const getAvailabilityColor = (percentage) => {
@@ -30,7 +31,12 @@ const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className
     }
     return `${availableSlots} available`;
   };
-  return (
+
+  const handleNameClick = (e) => {
+    e.stopPropagation();
+    navigate(`/facility/${facility.Id}`);
+  };
+return (
     <Card 
       className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-105 ${className}`}
       onClick={onClick}
@@ -41,7 +47,10 @@ const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className
             <ApperIcon name={facility.icon} size={24} className="text-primary" />
           </div>
           <div>
-            <h3 className="font-outfit font-semibold text-lg text-gray-900">
+<h3 
+              className="font-outfit font-semibold text-lg text-gray-900 hover:text-primary cursor-pointer transition-colors"
+              onClick={handleNameClick}
+            >
               {facility.name}
             </h3>
             <p className="text-sm text-gray-500">{facility.type}</p>
