@@ -4,10 +4,11 @@ import ApperIcon from "@/components/ApperIcon";
 import { cn } from "@/utils/cn";
 
 const MobileNavigation = () => {
-  const navItems = [
+const navItems = [
     { to: "/", icon: "LayoutDashboard", label: "Dashboard" },
     { to: "/book-facility", icon: "Calendar", label: "Book" },
-    { to: "/my-bookings", icon: "BookOpen", label: "Bookings" }
+    { to: "/my-bookings", icon: "BookOpen", label: "Bookings" },
+    { to: "/membership", icon: "CreditCard", label: "Credits" }
   ];
 
   return (

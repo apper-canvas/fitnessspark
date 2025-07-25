@@ -7,6 +7,7 @@ import BookFacility from "@/components/pages/BookFacility";
 import MyBookings from "@/components/pages/MyBookings";
 import Dashboard from "@/components/pages/Dashboard";
 import FacilityDetail from "@/components/pages/FacilityDetail";
+import Membership from "@/components/pages/Membership";
 import Layout from "@/components/organisms/Layout";
 import Error from "@/components/ui/Error";
 
@@ -56,11 +57,12 @@ function AppComponent() {
     <NotificationProvider>
     <div className="min-h-screen bg-white">
         <Layout>
-            <Routes>
+<Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/book-facility" element={<BookFacility />} />
                 <Route path="/facility/:id" element={<FacilityDetail />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
+                <Route path="/membership" element={<Membership />} />
             </Routes>
         </Layout>
         <ToastContainer
