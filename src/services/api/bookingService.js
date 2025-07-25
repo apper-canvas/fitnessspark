@@ -45,12 +45,16 @@ async create(bookingData) {
     return { ...bookings[index] };
   },
 
-  async delete(id) {
+async delete(id) {
     await delay(250);
     const index = bookings.findIndex(b => b.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Booking not found");
     }
+    
+    // Refund credit before deleting booking
+    await creditService.addCredit(1);
+    
     const deleted = bookings.splice(index, 1)[0];
     return { ...deleted };
   }

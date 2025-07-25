@@ -46,7 +46,7 @@ const BookingCard = ({ booking, onCancel, className }) => {
             {booking.status}
           </Badge>
           {booking.status === "confirmed" && (
-            <Button
+<Button
               variant="ghost"
               size="sm"
               onClick={() => onCancel(booking.Id)}
