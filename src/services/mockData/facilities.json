@@ -1,0 +1,37 @@
+[
+  {
+    "Id": 1,
+    "name": "Pool",
+    "type": "Swimming Pool",
+    "icon": "Waves",
+    "capacity": 20
+  },
+  {
+    "Id": 2,
+    "name": "Tennis Court",
+    "type": "Tennis Court",
+    "icon": "Trophy",
+    "capacity": 4
+  },
+  {
+    "Id": 3,
+    "name": "Gym",
+    "type": "Fitness Center",
+    "icon": "Dumbbell",
+    "capacity": 30
+  },
+  {
+    "Id": 4,
+    "name": "Yoga Studio",
+    "type": "Yoga & Meditation",
+    "icon": "Heart",
+    "capacity": 15
+  },
+  {
+    "Id": 5,
+    "name": "Squash Court",
+    "type": "Squash Court",
+    "icon": "Target",
+    "capacity": 2
+  }
+]

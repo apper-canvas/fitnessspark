@@ -1,0 +1,602 @@
+[
+  {
+    "Id": 1,
+    "facilityId": 1,
+    "startTime": "06:00",
+    "endTime": "07:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 2,
+    "facilityId": 1,
+    "startTime": "07:00",
+    "endTime": "08:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 3,
+    "facilityId": 1,
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 4,
+    "facilityId": 1,
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 5,
+    "facilityId": 1,
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 6,
+    "facilityId": 1,
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 7,
+    "facilityId": 1,
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 8,
+    "facilityId": 1,
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 9,
+    "facilityId": 1,
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 10,
+    "facilityId": 1,
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 11,
+    "facilityId": 1,
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 12,
+    "facilityId": 1,
+    "startTime": "17:00",
+    "endTime": "18:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 13,
+    "facilityId": 1,
+    "startTime": "18:00",
+    "endTime": "19:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 14,
+    "facilityId": 1,
+    "startTime": "19:00",
+    "endTime": "20:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 15,
+    "facilityId": 1,
+    "startTime": "20:00",
+    "endTime": "21:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 16,
+    "facilityId": 2,
+    "startTime": "06:00",
+    "endTime": "07:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 17,
+    "facilityId": 2,
+    "startTime": "07:00",
+    "endTime": "08:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 18,
+    "facilityId": 2,
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 19,
+    "facilityId": 2,
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 20,
+    "facilityId": 2,
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 21,
+    "facilityId": 2,
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 22,
+    "facilityId": 2,
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 23,
+    "facilityId": 2,
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 24,
+    "facilityId": 2,
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 25,
+    "facilityId": 2,
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 26,
+    "facilityId": 2,
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 27,
+    "facilityId": 2,
+    "startTime": "17:00",
+    "endTime": "18:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 28,
+    "facilityId": 2,
+    "startTime": "18:00",
+    "endTime": "19:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 29,
+    "facilityId": 2,
+    "startTime": "19:00",
+    "endTime": "20:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 30,
+    "facilityId": 2,
+    "startTime": "20:00",
+    "endTime": "21:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 31,
+    "facilityId": 3,
+    "startTime": "06:00",
+    "endTime": "07:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 32,
+    "facilityId": 3,
+    "startTime": "07:00",
+    "endTime": "08:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 33,
+    "facilityId": 3,
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 34,
+    "facilityId": 3,
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 35,
+    "facilityId": 3,
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 36,
+    "facilityId": 3,
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 37,
+    "facilityId": 3,
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 38,
+    "facilityId": 3,
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 39,
+    "facilityId": 3,
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 40,
+    "facilityId": 3,
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 41,
+    "facilityId": 3,
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 42,
+    "facilityId": 3,
+    "startTime": "17:00",
+    "endTime": "18:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 43,
+    "facilityId": 3,
+    "startTime": "18:00",
+    "endTime": "19:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 44,
+    "facilityId": 3,
+    "startTime": "19:00",
+    "endTime": "20:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 45,
+    "facilityId": 3,
+    "startTime": "20:00",
+    "endTime": "21:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 46,
+    "facilityId": 4,
+    "startTime": "06:00",
+    "endTime": "07:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 47,
+    "facilityId": 4,
+    "startTime": "07:00",
+    "endTime": "08:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 48,
+    "facilityId": 4,
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 49,
+    "facilityId": 4,
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 50,
+    "facilityId": 4,
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 51,
+    "facilityId": 4,
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 52,
+    "facilityId": 4,
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 53,
+    "facilityId": 4,
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 54,
+    "facilityId": 4,
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 55,
+    "facilityId": 4,
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 56,
+    "facilityId": 4,
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 57,
+    "facilityId": 4,
+    "startTime": "17:00",
+    "endTime": "18:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 58,
+    "facilityId": 4,
+    "startTime": "18:00",
+    "endTime": "19:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 59,
+    "facilityId": 4,
+    "startTime": "19:00",
+    "endTime": "20:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 60,
+    "facilityId": 4,
+    "startTime": "20:00",
+    "endTime": "21:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 61,
+    "facilityId": 5,
+    "startTime": "06:00",
+    "endTime": "07:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 62,
+    "facilityId": 5,
+    "startTime": "07:00",
+    "endTime": "08:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 63,
+    "facilityId": 5,
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 64,
+    "facilityId": 5,
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 65,
+    "facilityId": 5,
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 66,
+    "facilityId": 5,
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 67,
+    "facilityId": 5,
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 68,
+    "facilityId": 5,
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 69,
+    "facilityId": 5,
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 70,
+    "facilityId": 5,
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 71,
+    "facilityId": 5,
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 72,
+    "facilityId": 5,
+    "startTime": "17:00",
+    "endTime": "18:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 73,
+    "facilityId": 5,
+    "startTime": "18:00",
+    "endTime": "19:00",
+    "date": "2024-01-15",
+    "isAvailable": false
+  },
+  {
+    "Id": 74,
+    "facilityId": 5,
+    "startTime": "19:00",
+    "endTime": "20:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  },
+  {
+    "Id": 75,
+    "facilityId": 5,
+    "startTime": "20:00",
+    "endTime": "21:00",
+    "date": "2024-01-15",
+    "isAvailable": true
+  }
+]
