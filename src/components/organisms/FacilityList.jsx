@@ -25,6 +25,12 @@ const [facilities, setFacilities] = useState([]);
   const [pendingSlot, setPendingSlot] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [facilityTypeFilter, setFacilityTypeFilter] = useState("all");
+  const [timeRangeFilter, setTimeRangeFilter] = useState("all");
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+
   // Generate array of next 7 days starting from today
   const getAvailableDates = () => {
     const dates = [];
@@ -191,8 +197,52 @@ const getFacilityTimeSlots = (facilityId) => {
       slot.facilityId === facilityId && slot.date === selectedDateStr
     );
   };
-const getDisplayAvailableSlots = (facilityId) => {
+
+  const getDisplayAvailableSlots = (facilityId) => {
     return getFacilityTimeSlots(facilityId).filter(slot => slot.isAvailable).length;
+  };
+
+  // Filter facilities based on search term, type, time range, and availability
+  const getFilteredFacilities = () => {
+    return facilities.filter(facility => {
+      // Search filter
+      const matchesSearch = facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           facility.type.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      // Facility type filter
+      const matchesType = facilityTypeFilter === "all" || facility.type === facilityTypeFilter;
+      
+      // Time range filter based on operating hours
+      let matchesTimeRange = true;
+      if (timeRangeFilter !== "all") {
+        const openHour = parseInt(facility.operatingHours.open.split(':')[0]);
+        const closeHour = parseInt(facility.operatingHours.close.split(':')[0]);
+        
+        switch (timeRangeFilter) {
+          case "morning":
+            matchesTimeRange = openHour <= 9; // Opens before or at 9 AM
+            break;
+          case "afternoon":
+            matchesTimeRange = openHour <= 14 && closeHour >= 12; // Available during 12-2 PM
+            break;
+          case "evening":
+            matchesTimeRange = closeHour >= 18; // Closes at or after 6 PM
+            break;
+        }
+      }
+      
+      // Availability filter
+      const matchesAvailability = !showOnlyAvailable || 
+                                 (facility.status === "open" && getDisplayAvailableSlots(facility.Id) > 0);
+      
+      return matchesSearch && matchesType && matchesTimeRange && matchesAvailability;
+    });
+  };
+
+  // Get unique facility types for filter dropdown
+  const getFacilityTypes = () => {
+    const types = [...new Set(facilities.map(facility => facility.type))];
+    return types.sort();
   };
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadData} />;
@@ -236,8 +286,101 @@ const formatDateDisplay = (date) => {
     return currentIndex < availableDates.length - 1;
   };
 
-  return (
+return (
     <div className="space-y-6">
+      {/* Filter Controls */}
+      <Card className="p-6">
+        <div className="space-y-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <h2 className="font-outfit font-semibold text-lg text-gray-900">
+              Filter Facilities
+            </h2>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="showAvailable"
+                checked={showOnlyAvailable}
+                onChange={(e) => setShowOnlyAvailable(e.target.checked)}
+                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+              />
+              <label htmlFor="showAvailable" className="text-sm font-medium text-gray-700">
+                Show only available
+              </label>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search Bar */}
+            <div className="lg:col-span-2">
+              <div className="relative">
+                <ApperIcon 
+                  name="Search" 
+                  size={18} 
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+                />
+                <input
+                  type="text"
+                  placeholder="Search facilities..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Facility Type Filter */}
+            <div>
+              <select
+                value={facilityTypeFilter}
+                onChange={(e) => setFacilityTypeFilter(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              >
+                <option value="all">All Types</option>
+                {getFacilityTypes().map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Time Range Filter */}
+            <div>
+              <select
+                value={timeRangeFilter}
+                onChange={(e) => setTimeRangeFilter(e.target.value)}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              >
+                <option value="all">All Times</option>
+                <option value="morning">Morning (6AM-12PM)</option>
+                <option value="afternoon">Afternoon (12PM-6PM)</option>
+                <option value="evening">Evening (6PM-11PM)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Results Summary */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <p className="text-sm text-gray-600">
+              Showing {getFilteredFacilities().length} of {facilities.length} facilities
+            </p>
+            {(searchTerm || facilityTypeFilter !== "all" || timeRangeFilter !== "all" || showOnlyAvailable) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm("");
+                  setFacilityTypeFilter("all");
+                  setTimeRangeFilter("all");
+                  setShowOnlyAvailable(false);
+                }}
+                className="text-primary hover:text-primary/80"
+              >
+                <ApperIcon name="X" size={14} className="mr-1" />
+                Clear filters
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
       {/* Date Selector */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -289,25 +432,36 @@ const formatDateDisplay = (date) => {
             );
           })}
         </div>
-      </Card>
+</Card>
 
+      {/* Facilities Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-{facilities.map((facility) => (
-          <FacilityCard
-            key={facility.Id}
-            facility={facility}
-            availableSlots={getDisplayAvailableSlots(facility.Id)}
-            totalSlots={getFacilityTimeSlots(facility.Id).length}
-            realTimeCapacity={true}
-            onClick={(e) => {
-              if (!e.defaultPrevented) {
-                setExpandedFacility(
-                  expandedFacility === facility.Id ? null : facility.Id
-                );
-              }
-            }}
-          />
-        ))}
+{getFilteredFacilities().length > 0 ? (
+          getFilteredFacilities().map((facility) => (
+            <FacilityCard
+              key={facility.Id}
+              facility={facility}
+              availableSlots={getDisplayAvailableSlots(facility.Id)}
+              totalSlots={getFacilityTimeSlots(facility.Id).length}
+              realTimeCapacity={true}
+              onClick={(e) => {
+                if (!e.defaultPrevented) {
+                  setExpandedFacility(
+                    expandedFacility === facility.Id ? null : facility.Id
+                  );
+                }
+              }}
+            />
+          ))
+        ) : (
+          <div className="col-span-full">
+            <Empty
+              title="No facilities found"
+              description="Try adjusting your filters or search terms to find available facilities."
+              icon="Search"
+            />
+          </div>
+        )}
       </div>
 
       {expandedFacility && (
