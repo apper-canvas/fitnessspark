@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import FacilityCard from "@/components/molecules/FacilityCard";
-import TimeSlot from "@/components/molecules/TimeSlot";
-import Button from "@/components/atoms/Button";
+import React, { useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
+import { addDays, format, isToday, isTomorrow } from "date-fns";
+import { creditService } from "@/services/api/creditService";
+import { bookingService } from "@/services/api/bookingService";
+import { timeSlotService } from "@/services/api/timeSlotService";
+import { facilityService } from "@/services/api/facilityService";
+import ApperIcon from "@/components/ApperIcon";
 import Card from "@/components/atoms/Card";
-import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
+import TimeSlot from "@/components/molecules/TimeSlot";
+import FacilityCard from "@/components/molecules/FacilityCard";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import { facilityService } from "@/services/api/facilityService";
-import { timeSlotService } from "@/services/api/timeSlotService";
-import { bookingService } from "@/services/api/bookingService";
-import { creditService } from "@/services/api/creditService";
-import { toast } from "react-toastify";
-import { format, addDays, isToday, isTomorrow } from "date-fns";
+import Loading from "@/components/ui/Loading";
 const FacilityList = () => {
 const [facilities, setFacilities] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
@@ -36,24 +36,90 @@ const [facilities, setFacilities] = useState([]);
 
   const availableDates = getAvailableDates();
 
+const intervalRef = useRef(null);
+  const lastAvailabilityRef = useRef({});
+
   useEffect(() => {
     loadData();
+    
+    // Set up real-time polling for availability updates
+    intervalRef.current = setInterval(() => {
+      loadData(true); // Silent refresh
+    }, 30000); // Poll every 30 seconds
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [selectedDate]);
-  const loadData = async () => {
+
+  const loadData = async (silent = false) => {
     try {
-      setError(null);
-      setLoading(true);
+      if (!silent) {
+        setError(null);
+        setLoading(true);
+      }
+      
       const [facilitiesData, timeSlotsData] = await Promise.all([
         facilityService.getAll(),
         timeSlotService.getAll()
       ]);
+      
       setFacilities(facilitiesData);
       setTimeSlots(timeSlotsData);
+      
+      // Check for availability changes and notify
+      if (silent && Object.keys(lastAvailabilityRef.current).length > 0) {
+        const availabilityChanges = [];
+        facilitiesData.forEach(facility => {
+          const currentAvailable = getAvailableSlots(facility.Id, timeSlotsData);
+          const lastAvailable = lastAvailabilityRef.current[facility.Id];
+          
+          if (lastAvailable !== undefined && currentAvailable !== lastAvailable) {
+            availabilityChanges.push({
+              facility: facility.name,
+              change: currentAvailable - lastAvailable
+            });
+          }
+          lastAvailabilityRef.current[facility.Id] = currentAvailable;
+        });
+        
+        if (availabilityChanges.length > 0) {
+          availabilityChanges.forEach(change => {
+            if (change.change > 0) {
+              toast.success(`${change.facility}: ${change.change} more slot${change.change > 1 ? 's' : ''} became available!`);
+            } else {
+              toast.info(`${change.facility}: ${Math.abs(change.change)} slot${Math.abs(change.change) > 1 ? 's' : ''} just booked`);
+            }
+          });
+        }
+      } else {
+        // Initialize availability tracking
+        facilitiesData.forEach(facility => {
+          lastAvailabilityRef.current[facility.Id] = getAvailableSlots(facility.Id, timeSlotsData);
+        });
+      }
+      
     } catch (err) {
-      setError(err.message || "Failed to load facilities");
+      if (!silent) {
+        setError(err.message || "Failed to load facilities");
+      }
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
+  };
+
+  // Helper function to get available slots for a facility
+  const getAvailableSlots = (facilityId, slotsData = timeSlots) => {
+    const selectedDateStr = selectedDate.toISOString().split("T")[0];
+    return slotsData.filter(slot => 
+      slot.facilityId === facilityId && 
+      slot.date === selectedDateStr && 
+      slot.isAvailable
+    ).length;
   };
 
 const handleBookSlot = async (timeSlot) => {
@@ -228,12 +294,13 @@ const formatDateDisplay = (date) => {
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {facilities.map((facility) => (
+{facilities.map((facility) => (
           <FacilityCard
             key={facility.Id}
             facility={facility}
             availableSlots={getAvailableSlots(facility.Id)}
             totalSlots={getFacilityTimeSlots(facility.Id).length}
+            realTimeCapacity={true}
             onClick={() => setExpandedFacility(
               expandedFacility === facility.Id ? null : facility.Id
             )}

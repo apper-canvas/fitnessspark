@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import BookingCard from "@/components/molecules/BookingCard";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import Empty from "@/components/ui/Empty";
-import Button from "@/components/atoms/Button";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { bookingService } from "@/services/api/bookingService";
 import { timeSlotService } from "@/services/api/timeSlotService";
-import { toast } from "react-toastify";
+import Button from "@/components/atoms/Button";
+import BookingCard from "@/components/molecules/BookingCard";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
 const BookingsList = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +19,7 @@ const BookingsList = () => {
     loadBookings();
   }, []);
 
-  const loadBookings = async () => {
+const loadBookings = async () => {
     try {
       setError(null);
       setLoading(true);
@@ -28,6 +28,11 @@ const BookingsList = () => {
       const today = new Date().toISOString().split("T")[0];
       const upcomingBookings = data.filter(booking => booking.date >= today);
       setBookings(upcomingBookings);
+      
+// Trigger facility availability refresh
+      if (typeof window !== 'undefined' && window.dispatchEvent && typeof CustomEvent !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('refreshFacilityAvailability'));
+      }
     } catch (err) {
       setError(err.message || "Failed to load bookings");
     } finally {
@@ -43,7 +48,7 @@ const BookingsList = () => {
     }
   };
 
-  const confirmCancelBooking = async () => {
+const confirmCancelBooking = async () => {
     if (!bookingToCancel) return;
     
     try {
@@ -61,13 +66,23 @@ const BookingsList = () => {
         await timeSlotService.update(timeSlot.Id, { isAvailable: true });
       }
 
-      // Delete the booking (this will also refund the credit)
+      // Delete the booking (this will also refund the credit and notify availability change)
       await bookingService.delete(bookingToCancel.Id);
       
-      // Refresh bookings
+      // Refresh bookings and trigger facility availability update
       await loadBookings();
       
-      toast.success("Booking cancelled successfully! Your credit has been refunded.");
+// Additional immediate refresh trigger for facility list
+      if (typeof window !== 'undefined' && window.dispatchEvent && typeof CustomEvent !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('facilityAvailabilityChanged', {
+          detail: { 
+            facilityId: bookingToCancel.facilityId, 
+            change: 1,
+            immediate: true
+          }
+        }));
+      }
+      toast.success(`Booking cancelled successfully! Your credit has been refunded and the ${bookingToCancel.facilityName} slot is now available for others.`);
       setShowConfirmDialog(false);
       setBookingToCancel(null);
     } catch (err) {

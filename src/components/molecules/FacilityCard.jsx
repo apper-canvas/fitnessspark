@@ -3,7 +3,7 @@ import Card from "@/components/atoms/Card";
 import Badge from "@/components/atoms/Badge";
 import ApperIcon from "@/components/ApperIcon";
 
-const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className }) => {
+const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className, realTimeCapacity = false }) => {
   const availabilityPercentage = totalSlots > 0 ? (availableSlots / totalSlots) * 100 : 0;
   
   const getAvailabilityColor = (percentage) => {
@@ -24,6 +24,12 @@ const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className
     return "error";
   };
 
+  const getCapacityDisplay = () => {
+    if (realTimeCapacity) {
+      return `${availableSlots}/${totalSlots} slots available`;
+    }
+    return `${availableSlots} available`;
+  };
   return (
     <Card 
       className={`p-6 cursor-pointer transition-all duration-200 hover:shadow-xl hover:scale-105 ${className}`}
@@ -41,8 +47,8 @@ const FacilityCard = ({ facility, availableSlots, totalSlots, onClick, className
             <p className="text-sm text-gray-500">{facility.type}</p>
           </div>
         </div>
-        <Badge variant={getAvailabilityVariant(availabilityPercentage)}>
-          {availableSlots} available
+<Badge variant={getAvailabilityVariant(availabilityPercentage)}>
+          {getCapacityDisplay()}
         </Badge>
       </div>
       
